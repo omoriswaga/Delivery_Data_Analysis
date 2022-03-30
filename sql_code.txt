@@ -1,0 +1,9 @@
+select distinct A.country, T.carrier, status, avg(DATEDIFF(day,T.datetime,dates)) as average_transit_time,
+(count(tracker_id)/avg(DATEDIFF(day,T.datetime,dates))) as delivery_in_a_day
+from Shipments as S 
+left join Tracker as T on S.id = T.shipment_id
+inner join (select distinct tracker_id, status, datetime as dates from Details) as D on T.id = D.tracker_id											
+left join Address as A on S.address_id = A.id
+where status in ("SUCCESS","DELIVERY_FAILED","arrived_at_destination","failure")
+group by country,carrier,status
+;
